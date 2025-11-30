@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:tubes/pages/foryou_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -9,6 +10,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int selectedTab = 0; // 0 = terbaru, 1 = terpopuler, 2 = for you
+
+  List<String> selectedBerita = [];
 
   @override
   Widget build(BuildContext context) {
@@ -114,55 +117,78 @@ class _HomePageState extends State<HomePage> {
   // HALAMAN FOR YOU
   // =====================================================================
  Widget buildForYou() {
-  return Center(
-    child: Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const SizedBox(height: 60),
-
-        const Text(
-          "PILIH BERITA FAVORITMU",
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-
-        const SizedBox(height: 10),
-
-        const Text(
-          "Halaman ini akan diisi oleh berita yang\nAnda sukai",
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: Colors.white70,
-            fontSize: 14,
-          ),
-        ),
-
-        const SizedBox(height: 25),
-
-        ElevatedButton(
-          onPressed: () {
-            // Arahkan ke halaman pilih berita (bisa kamu isi)
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF2196F3),
-            padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 10),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20),
+  // jika belum pilih apa pun
+  if (selectedBerita.isEmpty) {
+    return Center(
+      child: Column(
+        children: [
+          const SizedBox(height: 60),
+          const Text(
+            "PILIH BERITA FAVORITMU",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          child: const Text(
-            "MULAI PILIH BERITA",
-            style: TextStyle(fontSize: 13, color: Colors.white),
+          const SizedBox(height: 10),
+          const Text(
+            "Halaman ini akan diisi oleh berita yang\nAnda sukai",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              color: Colors.white70,
+              fontSize: 14,
+            ),
           ),
-        ),
-      ],
-    ),
+          const SizedBox(height: 25),
+
+          ElevatedButton(
+            onPressed: () async {
+              final result = await Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ForYouPage()),
+              );
+
+              if (result != null && result is List<String>) {
+                setState(() {
+                  selectedBerita = result;
+                });
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF2196F3),
+              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 10),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+            child: const Text(
+              "MULAI PILIH BERITA",
+              style: TextStyle(fontSize: 13, color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // jika sudah ada data berita dari user
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      const Text(
+        "BERITA SESUAI MINATMU",
+        style: TextStyle(
+            fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+      ),
+      const SizedBox(height: 12),
+
+      ...selectedBerita.map((item) => beritaCard(item)).toList(),
+    ],
   );
 }
+
 
   // =====================================================================
   // CARD BERITA
