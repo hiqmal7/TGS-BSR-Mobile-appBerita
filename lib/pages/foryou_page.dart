@@ -137,7 +137,7 @@ class _ForYouPageState extends State<ForYouPage> {
                 const SizedBox(height: 14),
               ],
             );
-          }).toList(),
+          }),
 
           const SizedBox(height: 20),
 

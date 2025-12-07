@@ -184,7 +184,7 @@ class _HomePageState extends State<HomePage> {
       ),
       const SizedBox(height: 12),
 
-      ...selectedBerita.map((item) => beritaCard(item)).toList(),
+      ...selectedBerita.map((item) => beritaCard(item)),
     ],
   );
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:tubes/pages/foryou_page.dart';
 import 'pages/home_page.dart';
 import 'pages/discover_page.dart';
 import 'pages/search_page.dart';
@@ -36,7 +35,6 @@ class _MainNavigationState extends State<MainNavigation> {
     DiscoverPage(),
     SearchPage(),
     ProfilePage(),
-    ForYouPage(),
   ];
 
   @override
