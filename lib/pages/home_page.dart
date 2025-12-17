@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:tubes/models/news_model.dart';
 import 'package:tubes/pages/foryou_page.dart';
+import 'package:tubes/services/news_service.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -10,6 +12,13 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int selectedTab = 0; // 0 = terbaru, 1 = terpopuler, 2 = for you
+  late Future<List<NewsModel>> esportNews;
+
+@override
+  void initState() {
+    super.initState();
+    esportNews = NewsService().fetchEsportNews();
+  }
 
   List<String> selectedBerita = [];
 
@@ -80,20 +89,45 @@ class _HomePageState extends State<HomePage> {
   // =====================================================================
   // HALAMAN TERBARU
   // =====================================================================
-  Widget buildTerbaru() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          "BERITA ESPORTS",
-          style: TextStyle(
-              fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 12),
-        ...List.generate(4, (i) => beritaCard("Terbaru $i")),
-      ],
-    );
-  }
+ Widget buildTerbaru() {
+  return FutureBuilder<List<NewsModel>>(
+    future: esportNews,
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return const Center(child: CircularProgressIndicator());
+      }
+
+      if (snapshot.hasError) {
+        return const Text(
+          "Gagal memuat berita",
+          style: TextStyle(color: Colors.white),
+        );
+      }
+
+      final data = snapshot.data!;
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "BERITA ESPORTS",
+            style: TextStyle(
+                fontSize: 18,
+                color: Colors.white,
+                fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 12),
+          ...data.map((e) => beritaCard(
+                e.title,
+                e.description,
+                e.imageUrl,
+              )),
+        ],
+      );
+    },
+  );
+}
+
 
   // =====================================================================
   // HALAMAN TERPOPULER
@@ -108,7 +142,11 @@ class _HomePageState extends State<HomePage> {
               fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 12),
-        ...List.generate(4, (i) => beritaCard("Terpopuler $i")),
+        ...List.generate(4, (i) => beritaCard(
+          "Terpopuler $i",
+          "Deskripsi berita",
+          "",
+        )),
       ],
     );
   }
@@ -184,7 +222,11 @@ class _HomePageState extends State<HomePage> {
       ),
       const SizedBox(height: 12),
 
-      ...selectedBerita.map((item) => beritaCard(item)),
+      ...selectedBerita.map((item) => beritaCard(
+        item,
+        "Berita sesuai minat kamu",
+        "",
+      )),
     ],
   );
 }
@@ -193,63 +235,72 @@ class _HomePageState extends State<HomePage> {
   // =====================================================================
   // CARD BERITA
   // =====================================================================
-  Widget beritaCard(String title) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 14),
-      decoration: BoxDecoration(
-        color: const Color(0xFF2C2C2C),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 90,
-            height: 90,
-            margin: const EdgeInsets.all(10),
-            color: Colors.grey[400],
-            child: const Icon(Icons.image, size: 40),
+  Widget beritaCard(String title, String desc, String image) {
+  return Container(
+    margin: const EdgeInsets.only(bottom: 14),
+    decoration: BoxDecoration(
+      color: const Color(0xFF2C2C2C),
+      borderRadius: BorderRadius.circular(8),
+    ),
+    child: Row(
+      children: [
+        Container(
+          width: 90,
+          height: 90,
+          margin: const EdgeInsets.all(10),
+          child: Image.network(
+            image,
+            fit: BoxFit.cover,
+            errorBuilder: (_, __, ___) =>
+                const Icon(Icons.image, size: 40),
           ),
+        ),
 
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      color: Colors.lightBlueAccent,
-                      fontWeight: FontWeight.bold,
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 14),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: const TextStyle(
+                    color: Colors.lightBlueAccent,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  desc,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: const TextStyle(
+                    color: Colors.white70,
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: const [
+                    Text(
+                      "BACA SELENGKAPNYA",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 12,
+                          decoration: TextDecoration.underline),
                     ),
-                  ),
-                  const SizedBox(height: 6),
-                  const Text(
-                    "Lorem Ipsum is simply dummy text of the printing and typesetting industry",
-                    style: TextStyle(color: Colors.white70, fontSize: 12),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: const [
-                      Text(
-                        "BACA SELENGKAPNYA",
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            decoration: TextDecoration.underline),
-                      ),
-                      Spacer(),
-                      Icon(Icons.bookmark_border, color: Colors.white70),
-                      SizedBox(width: 5),
-                      Icon(Icons.share, color: Colors.white70),
-                    ],
-                  ),
-                ],
-              ),
+                    Spacer(),
+                    Icon(Icons.bookmark_border, color: Colors.white70),
+                    SizedBox(width: 5),
+                    Icon(Icons.share, color: Colors.white70),
+                  ],
+                ),
+              ],
             ),
-          )
-        ],
-      ),
-    );
-  }
+          ),
+        )
+      ],
+    ),
+  );
+}
 }
