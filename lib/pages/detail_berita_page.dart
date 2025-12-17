@@ -20,7 +20,6 @@ class DetailBeritaPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-
             // ================= HEADER IMAGE =================
             if (news.imageUrl.isNotEmpty)
               Image.network(
@@ -37,7 +36,6 @@ class DetailBeritaPage extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-
                   // ================= JUDUL =================
                   Text(
                     news.title,
@@ -53,19 +51,14 @@ class DetailBeritaPage extends StatelessWidget {
                   // ================= TANGGAL =================
                   Text(
                     news.publishedAt,
-                    style: const TextStyle(
-                      color: Colors.white60,
-                      fontSize: 12,
-                    ),
+                    style: const TextStyle(color: Colors.white60, fontSize: 12),
                   ),
 
                   const SizedBox(height: 20),
 
                   // ================= ISI ARTIKEL =================
                   Text(
-                    news.content.isNotEmpty
-                        ? news.content
-                        : news.description,
+                    news.content.isNotEmpty ? news.content : news.description,
                     style: const TextStyle(
                       color: Colors.white70,
                       fontSize: 15,

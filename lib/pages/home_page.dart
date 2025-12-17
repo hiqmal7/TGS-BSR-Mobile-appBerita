@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:tubes/models/news_model.dart';
+import 'package:tubes/pages/detail_berita_page.dart';
 import 'package:tubes/pages/foryou_page.dart';
 import 'package:tubes/services/news_service.dart';
 
@@ -108,7 +109,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             const SizedBox(height: 12),
-            ...data.map((e) => beritaCard(e.title, e.description, e.imageUrl)),
+            ...data.map((e) => beritaCard(e)),
           ],
         );
       },
@@ -133,7 +134,15 @@ class _HomePageState extends State<HomePage> {
         const SizedBox(height: 12),
         ...List.generate(
           4,
-          (i) => beritaCard("Terpopuler $i", "Deskripsi berita", ""),
+          (i) => beritaCard(
+            NewsModel(
+              title: "Terpopuler $i",
+              description: "Deskripsi berita",
+              imageUrl: "",
+              content: "",
+              publishedAt: "",
+            ),
+          ),
         ),
       ],
     );
@@ -214,7 +223,15 @@ class _HomePageState extends State<HomePage> {
         const SizedBox(height: 12),
 
         ...selectedBerita.map(
-          (item) => beritaCard(item, "Berita sesuai minat kamu", ""),
+          (item) => beritaCard(
+            NewsModel(
+              title: item,
+              description: "Berita sesuai minat kamu",
+              imageUrl: "",
+              content: "",
+              publishedAt: "",
+            ),
+          ),
         ),
       ],
     );
@@ -223,68 +240,78 @@ class _HomePageState extends State<HomePage> {
   // =====================================================================
   // CARD BERITA
   // =====================================================================
-  Widget beritaCard(String title, String desc, String image) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 14),
-      decoration: BoxDecoration(
-        color: const Color(0xFF2C2C2C),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: [
-          Container(
-            width: 90,
-            height: 90,
-            margin: const EdgeInsets.all(10),
-            child: Image.network(
-              image,
-              fit: BoxFit.cover,
-              errorBuilder: (_, __, ___) => const Icon(Icons.image, size: 40),
-            ),
-          ),
-
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 14),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: const TextStyle(
-                      color: Colors.lightBlueAccent,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    desc,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(color: Colors.white70, fontSize: 12),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: const [
-                      Text(
-                        "BACA SELENGKAPNYA",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 12,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                      Spacer(),
-                      Icon(Icons.bookmark_border, color: Colors.white70),
-                      SizedBox(width: 5),
-                      Icon(Icons.share, color: Colors.white70),
-                    ],
-                  ),
-                ],
+  Widget beritaCard(NewsModel news) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => DetailBeritaPage(news: news)),
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 14),
+        decoration: BoxDecoration(
+          color: const Color(0xFF2C2C2C),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 90,
+              height: 90,
+              margin: const EdgeInsets.all(10),
+              child: Image.network(
+                news.imageUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (_, __, ___) => const Icon(Icons.image, size: 40),
               ),
             ),
-          ),
-        ],
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      news.title,
+                      style: const TextStyle(
+                        color: Colors.lightBlueAccent,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      news.description,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        color: Colors.white70,
+                        fontSize: 12,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: const [
+                        Text(
+                          "BACA SELENGKAPNYA",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                        Spacer(),
+                        Icon(Icons.bookmark_border, color: Colors.white70),
+                        SizedBox(width: 5),
+                        Icon(Icons.share, color: Colors.white70),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
