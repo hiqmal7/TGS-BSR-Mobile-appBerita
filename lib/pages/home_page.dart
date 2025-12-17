@@ -17,17 +17,6 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFF1E1E1E),
-
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF0E2A6E),
-        toolbarHeight: 70,
-        title: Row(
-          children: [
-            Image.asset("assets/Logo.jpg", height: 40),
-          ],
-        ),
-      ),
-
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
@@ -87,7 +76,10 @@ class _HomePageState extends State<HomePage> {
         const Text(
           "BERITA ESPORTS",
           style: TextStyle(
-              fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+            fontSize: 18,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 12),
         ...List.generate(4, (i) => beritaCard("Terbaru $i")),
@@ -105,7 +97,10 @@ class _HomePageState extends State<HomePage> {
         const Text(
           "BERITA ESPORTS",
           style: TextStyle(
-              fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
+            fontSize: 18,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         const SizedBox(height: 12),
         ...List.generate(4, (i) => beritaCard("Terpopuler $i")),
@@ -116,79 +111,81 @@ class _HomePageState extends State<HomePage> {
   // =====================================================================
   // HALAMAN FOR YOU
   // =====================================================================
- Widget buildForYou() {
-  // jika belum pilih apa pun
-  if (selectedBerita.isEmpty) {
-    return Center(
-      child: Column(
-        children: [
-          const SizedBox(height: 60),
-          const Text(
-            "PILIH BERITA FAVORITMU",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 10),
-          const Text(
-            "Halaman ini akan diisi oleh berita yang\nAnda sukai",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: Colors.white70,
-              fontSize: 14,
-            ),
-          ),
-          const SizedBox(height: 25),
-
-          ElevatedButton(
-            onPressed: () async {
-              final result = await Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ForYouPage()),
-              );
-
-              if (result != null && result is List<String>) {
-                setState(() {
-                  selectedBerita = result;
-                });
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF2196F3),
-              padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 10),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+  Widget buildForYou() {
+    // jika belum pilih apa pun
+    if (selectedBerita.isEmpty) {
+      return Center(
+        child: Column(
+          children: [
+            const SizedBox(height: 60),
+            const Text(
+              "PILIH BERITA FAVORITMU",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
               ),
             ),
-            child: const Text(
-              "MULAI PILIH BERITA",
-              style: TextStyle(fontSize: 13, color: Colors.white),
+            const SizedBox(height: 10),
+            const Text(
+              "Halaman ini akan diisi oleh berita yang\nAnda sukai",
+              textAlign: TextAlign.center,
+              style: TextStyle(color: Colors.white70, fontSize: 14),
             ),
+            const SizedBox(height: 25),
+
+            ElevatedButton(
+              onPressed: () async {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const ForYouPage()),
+                );
+
+                if (result != null && result is List<String>) {
+                  setState(() {
+                    selectedBerita = result;
+                  });
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFF2196F3),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 28,
+                  vertical: 10,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20),
+                ),
+              ),
+              child: const Text(
+                "MULAI PILIH BERITA",
+                style: TextStyle(fontSize: 13, color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // jika sudah ada data berita dari user
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "BERITA SESUAI MINATMU",
+          style: TextStyle(
+            fontSize: 18,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
           ),
-        ],
-      ),
+        ),
+        const SizedBox(height: 12),
+
+        ...selectedBerita.map((item) => beritaCard(item)),
+      ],
     );
   }
-
-  // jika sudah ada data berita dari user
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      const Text(
-        "BERITA SESUAI MINATMU",
-        style: TextStyle(
-            fontSize: 18, color: Colors.white, fontWeight: FontWeight.bold),
-      ),
-      const SizedBox(height: 12),
-
-      ...selectedBerita.map((item) => beritaCard(item)),
-    ],
-  );
-}
-
 
   // =====================================================================
   // CARD BERITA
@@ -234,9 +231,10 @@ class _HomePageState extends State<HomePage> {
                       Text(
                         "BACA SELENGKAPNYA",
                         style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
-                            decoration: TextDecoration.underline),
+                          color: Colors.white,
+                          fontSize: 12,
+                          decoration: TextDecoration.underline,
+                        ),
                       ),
                       Spacer(),
                       Icon(Icons.bookmark_border, color: Colors.white70),
@@ -247,7 +245,7 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
-          )
+          ),
         ],
       ),
     );
