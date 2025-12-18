@@ -1,154 +1,164 @@
 import 'package:flutter/material.dart';
+import '../models/video_model.dart';
+import '../data/video_data.dart';
+import 'video_player_page.dart';
 
-class DiscoverPage extends StatelessWidget {
+class DiscoverPage extends StatefulWidget {
   const DiscoverPage({super.key});
+
+  @override
+  State<DiscoverPage> createState() => _DiscoverPageState();
+}
+
+class _DiscoverPageState extends State<DiscoverPage> {
+  String selectedCategory = "All";
+
+  List<VideoModel> get filteredVideos {
+    if (selectedCategory == "All") return allVideos;
+    return allVideos
+        .where((v) => v.category == selectedCategory)
+        .toList();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
-      appBar: AppBar(
-        backgroundColor: Colors.black,
-        elevation: 0,
-        title: const Text("Discover", style: TextStyle(color: Colors.white)),
-      ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // 🔥 Trending Banner
-            _sectionTitle("🔥 Trending"),
-            const SizedBox(height: 12),
-            _trendingCard(context),
+            const Text(
+              "Discover",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 16),
 
-            // 🕹️ Kategori
-            _sectionTitle("Kategori"),
-            const SizedBox(height: 12),
-            _kategoriSection(),
+            // 🔥 TRENDING VIDEO
+            if (filteredVideos.isNotEmpty)
+              trendingVideoCard(filteredVideos.first),
 
-            const SizedBox(height: 24),
+            const SizedBox(height: 20),
 
-            // ⭐ Recommended
-            _sectionTitle("Recommended for You"),
-            const SizedBox(height: 12),
-            _recommendedList(context),
+            // 🎮 KATEGORI
+            const Text("Kategori",
+                style: TextStyle(color: Colors.white, fontSize: 16)),
+            const SizedBox(height: 10),
+
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  categoryButton("All"),
+                  categoryButton("PUBG"),
+                  categoryButton("Free Fire"),
+                  categoryButton("Valorant"),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 20),
+
+            // 📃 LIST VIDEO
+            const Text("Recommended for You",
+                style: TextStyle(color: Colors.white, fontSize: 16)),
+            const SizedBox(height: 10),
+
+            ...filteredVideos.map(videoListCard).toList(),
           ],
         ),
       ),
     );
   }
 
-  // ================== WIDGET ==================
+  // ================= WIDGET =================
 
-  Widget _sectionTitle(String title) {
-    return Text(
-      title,
-      style: const TextStyle(
-        color: Colors.white,
-        fontSize: 16,
-        fontWeight: FontWeight.bold,
+  Widget categoryButton(String title) {
+    final active = selectedCategory == title;
+    return Padding(
+      padding: const EdgeInsets.only(right: 8),
+      child: GestureDetector(
+        onTap: () {
+          setState(() => selectedCategory = title);
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+          decoration: BoxDecoration(
+            color: active ? Colors.blue : const Color(0xFF2C2C2C),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            title,
+            style: const TextStyle(color: Colors.white, fontSize: 12),
+          ),
+        ),
       ),
     );
   }
 
-  Widget _trendingCard(BuildContext context) {
+  Widget trendingVideoCard(VideoModel video) {
     return GestureDetector(
       onTap: () {
-        // ke detail berita
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => VideoPlayerPage(video: video),
+          ),
+        );
       },
       child: Container(
         height: 180,
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          color: Colors.grey[400],
+          borderRadius: BorderRadius.circular(14),
+          image: DecorationImage(
+            image: NetworkImage(video.thumbnail),
+            fit: BoxFit.cover,
+          ),
         ),
-        child: Stack(
-          children: [
-            Positioned.fill(
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                  gradient: LinearGradient(
-                    colors: [Colors.black.withOpacity(0.6), Colors.transparent],
-                    begin: Alignment.bottomCenter,
-                    end: Alignment.topCenter,
-                  ),
-                ),
-              ),
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          alignment: Alignment.bottomLeft,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(14),
+            gradient: LinearGradient(
+              colors: [
+                Colors.black.withOpacity(0.7),
+                Colors.transparent,
+              ],
+              begin: Alignment.bottomCenter,
+              end: Alignment.topCenter,
             ),
-            const Positioned(
-              left: 12,
-              bottom: 12,
-              right: 12,
-              child: Text(
-                "Final PMPL SEA: Tim Indonesia Dominasi Turnamen",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 15,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+          ),
+          child: Text(
+            video.title,
+            style: const TextStyle(
+              color: Colors.white,
+              fontWeight: FontWeight.bold,
             ),
-          ],
+          ),
         ),
       ),
     );
   }
 
-  Widget _kategoriSection() {
-    final kategori = [
-      "Mobile Legends",
-      "PUBG",
-      "Valorant",
-      "Free Fire",
-      "Dota 2",
-    ];
-
-    return SizedBox(
-      height: 38,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        itemCount: kategori.length,
-        separatorBuilder: (_, __) => const SizedBox(width: 10),
-        itemBuilder: (context, index) {
-          return Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14),
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: const Color(0xFF2C2C2C),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              kategori[index],
-              style: const TextStyle(color: Colors.white70),
-            ),
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _recommendedList(BuildContext context) {
-    return ListView.separated(
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: 4,
-      separatorBuilder: (_, __) => const SizedBox(height: 14),
-      itemBuilder: (context, index) {
-        return _recommendedCard(context, "Rekomendasi Berita ${index + 1}");
-      },
-    );
-  }
-
-  Widget _recommendedCard(BuildContext context, String title) {
+  Widget videoListCard(VideoModel video) {
     return GestureDetector(
       onTap: () {
-        // ke detail berita
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => VideoPlayerPage(video: video),
+          ),
+        );
       },
       child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(12),
         decoration: BoxDecoration(
           color: const Color(0xFF2C2C2C),
@@ -157,29 +167,28 @@ class DiscoverPage extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              width: 80,
-              height: 80,
+              width: 70,
+              height: 70,
               decoration: BoxDecoration(
-                color: Colors.grey[400],
                 borderRadius: BorderRadius.circular(8),
+                image: DecorationImage(
+                  image: NetworkImage(video.thumbnail),
+                  fit: BoxFit.cover,
+                ),
               ),
-              child: const Icon(Icons.image),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
-                title,
+                video.title,
                 style: const TextStyle(
                   color: Colors.lightBlueAccent,
                   fontWeight: FontWeight.bold,
                 ),
               ),
             ),
-            const Icon(
-              Icons.arrow_forward_ios,
-              size: 16,
-              color: Colors.white54,
-            ),
+            const Icon(Icons.play_circle_fill,
+                color: Colors.white54, size: 26),
           ],
         ),
       ),

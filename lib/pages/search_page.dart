@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../models/news_model.dart';
+import '../services/news_service.dart';
+import 'detail_berita_page.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -10,38 +13,54 @@ class SearchPage extends StatefulWidget {
 class _SearchPageState extends State<SearchPage> {
   final TextEditingController searchController = TextEditingController();
 
-  final List<String> allBerita = [
-    "Mobile Legends World Championship",
-    "PUBG Mobile Pro League",
-    "Valorant Champions Tour",
-    "Free Fire World Series",
-    "Dota 2 The International",
-  ];
+  List<NewsModel> hasilPencarian = [];
+  bool isLoading = false;
+  String error = '';
 
-  List<String> hasilPencarian = [];
+  Future<void> cariBerita(String query) async {
+    if (query.isEmpty) {
+      setState(() => hasilPencarian = []);
+      return;
+    }
 
-  void cariBerita(String query) {
     setState(() {
-      hasilPencarian = allBerita
-          .where((judul) => judul.toLowerCase().contains(query.toLowerCase()))
-          .toList();
+      isLoading = true;
+      error = '';
     });
+
+    try {
+      final result = await NewsService().searchEsportNews(query);
+      setState(() {
+        hasilPencarian = result;
+      });
+    } catch (e) {
+      print('ERROR SEARCH: $e');
+      setState(() {
+        error = 'Gagal memuat berita';
+      });
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.black,
+
       appBar: AppBar(
         backgroundColor: Colors.black,
         elevation: 0,
         title: const Text("Search", style: TextStyle(color: Colors.white)),
       ),
+
       body: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // 🔍 Search Bar
+            // ================= SEARCH BAR =================
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               decoration: BoxDecoration(
@@ -63,26 +82,30 @@ class _SearchPageState extends State<SearchPage> {
 
             const SizedBox(height: 20),
 
-            // 📃 Hasil Pencarian
+            // ================= RESULT =================
             Expanded(
-              child: hasilPencarian.isEmpty && searchController.text.isNotEmpty
+              child: isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : error.isNotEmpty
+                  ? Center(
+                      child: Text(
+                        error,
+                        style: const TextStyle(color: Colors.white54),
+                      ),
+                    )
+                  : hasilPencarian.isEmpty
                   ? const Center(
                       child: Text(
-                        "Berita tidak ditemukan",
+                        "Tidak ada hasil",
                         style: TextStyle(color: Colors.white54),
                       ),
                     )
                   : ListView.separated(
-                      itemCount: hasilPencarian.isEmpty
-                          ? allBerita.length
-                          : hasilPencarian.length,
+                      itemCount: hasilPencarian.length,
                       separatorBuilder: (_, __) => const SizedBox(height: 14),
                       itemBuilder: (context, index) {
-                        final title = hasilPencarian.isEmpty
-                            ? allBerita[index]
-                            : hasilPencarian[index];
-
-                        return beritaSearchCard(title, context);
+                        final news = hasilPencarian[index];
+                        return beritaSearchCard(news, context);
                       },
                     ),
             ),
@@ -93,10 +116,13 @@ class _SearchPageState extends State<SearchPage> {
   }
 }
 
-Widget beritaSearchCard(String title, BuildContext context) {
+Widget beritaSearchCard(NewsModel news, BuildContext context) {
   return GestureDetector(
     onTap: () {
-      // nanti arahkan ke DetailBeritaPage
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => DetailBeritaPage(news: news)),
+      );
     },
     child: Container(
       padding: const EdgeInsets.all(12),
@@ -106,25 +132,39 @@ Widget beritaSearchCard(String title, BuildContext context) {
       ),
       child: Row(
         children: [
+          // ================= IMAGE =================
           Container(
             width: 70,
             height: 70,
             decoration: BoxDecoration(
-              color: Colors.grey[400],
+              color: Colors.grey[800],
               borderRadius: BorderRadius.circular(8),
             ),
-            child: const Icon(Icons.image),
+            child: news.imageUrl.isNotEmpty
+                ? Image.network(
+                    news.imageUrl,
+                    fit: BoxFit.cover,
+                    errorBuilder: (_, __, ___) =>
+                        const Icon(Icons.image, color: Colors.white54),
+                  )
+                : const Icon(Icons.image, color: Colors.white54),
           ),
+
           const SizedBox(width: 12),
+
+          // ================= TITLE =================
           Expanded(
             child: Text(
-              title,
+              news.title,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 color: Colors.lightBlueAccent,
                 fontWeight: FontWeight.bold,
               ),
             ),
           ),
+
           const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.white54),
         ],
       ),
