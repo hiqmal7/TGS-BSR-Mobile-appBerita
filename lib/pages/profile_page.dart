@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'login_page.dart';
 
 class ProfilePage extends StatelessWidget {
   const ProfilePage({super.key});
 
- @override
+  @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
       child: Column(
@@ -13,7 +14,10 @@ class ProfilePage extends StatelessWidget {
             padding: const EdgeInsets.all(30),
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [const Color.fromARGB(255, 3, 3, 3), Colors.blue.shade700],
+                colors: [
+                  const Color.fromARGB(255, 3, 3, 3),
+                  Colors.blue.shade700
+                ],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -41,13 +45,17 @@ class ProfilePage extends StatelessWidget {
               ],
             ),
           ),
+
           const SizedBox(height: 20),
           _buildMenuItem(context, Icons.person_outline, 'Profil Saya'),
           _buildMenuItem(context, Icons.settings_outlined, 'Pengaturan'),
           _buildMenuItem(context, Icons.notifications_outlined, 'Notifikasi'),
           _buildMenuItem(context, Icons.help_outline, 'Bantuan'),
           _buildMenuItem(context, Icons.info_outline, 'Tentang Aplikasi'),
+
           const SizedBox(height: 10),
+
+          // Tombol Keluar
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16),
             child: ElevatedButton(
@@ -66,6 +74,36 @@ class ProfilePage extends StatelessWidget {
               ),
             ),
           ),
+
+          const SizedBox(height: 10),
+
+          // Tombol Login
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const LoginPage(),
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue.shade700,
+                foregroundColor: Colors.white,
+                minimumSize: const Size(double.infinity, 50),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              child: const Text(
+                'Login',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+          ),
+
           const SizedBox(height: 20),
         ],
       ),
