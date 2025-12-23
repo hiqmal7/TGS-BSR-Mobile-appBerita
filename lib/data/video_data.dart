@@ -1,4 +1,5 @@
-import '../models/video_model.dart';
+import 'package:tubes/models/video_model.dart';
+
 
 final List<VideoModel> allVideos = [
   VideoModel(
